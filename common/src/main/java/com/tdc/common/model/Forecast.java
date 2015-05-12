@@ -1,17 +1,25 @@
 package com.tdc.common.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by douglas on 5/11/15.
  */
-public class Forecast {
+
+public class Forecast implements Parcelable {
 
     int cod;
     String message;
     City city;
     int cnt;
     List<LotOfThings> list;
+
+    public Forecast() {
+    }
 
     public int getCod() {
         return cod;
@@ -53,49 +61,49 @@ public class Forecast {
         this.list = list;
     }
 
-    /*
-    {
-    "cod": "200",
-    "message": 0.0203,
-    "city": {
-        "id": 3463237,
-        "name": "Florianopolis",
-        "coord": {
-            "lon": -48.549171,
-            "lat": -27.59667
-        },
-        "country": "BR",
-        "population": 0,
-        "sys": {
-            "population": 0
+
+    protected Forecast(Parcel in) {
+        cod = in.readInt();
+        message = in.readString();
+        city = (City) in.readValue(City.class.getClassLoader());
+        cnt = in.readInt();
+        if (in.readByte() == 0x01) {
+            list = new ArrayList<LotOfThings>();
+            in.readList(list, LotOfThings.class.getClassLoader());
+        } else {
+            list = null;
         }
-    },
-    "cnt": 7,
-    "list": [
-        {
-            "dt": 1431356400,
-            "temp": {
-                "day": 15.31,
-                "min": 14.43,
-                "max": 15.31,
-                "night": 14.67,
-                "eve": 15.31,
-                "morn": 15.31
-            },
-            "pressure": 964.68,
-            "humidity": 100,
-            "weather": [
-                {
-                    "id": 502,
-                    "main": "Rain",
-                    "description": "heavy intensity rain",
-                    "icon": "10d"
-                }
-            ],
-            "speed": 10.37,
-            "deg": 193,
-            "clouds": 92,
-            "rain": 19.01
-        },
-     */
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(cod);
+        dest.writeString(message);
+        dest.writeValue(city);
+        dest.writeInt(cnt);
+        if (list == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(list);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Forecast> CREATOR = new Parcelable.Creator<Forecast>() {
+        @Override
+        public Forecast createFromParcel(Parcel in) {
+            return new Forecast(in);
+        }
+
+        @Override
+        public Forecast[] newArray(int size) {
+            return new Forecast[size];
+        }
+    };
 }

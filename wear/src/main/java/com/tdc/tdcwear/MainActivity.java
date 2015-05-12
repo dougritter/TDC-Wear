@@ -26,6 +26,8 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.tdc.common.Constants;
+import com.tdc.common.DataMapParcelableUtils;
+import com.tdc.common.model.Forecast;
 
 import java.util.Date;
 import java.util.List;
@@ -178,6 +180,8 @@ public class MainActivity extends Activity implements DataApi.DataListener,
                             .getString(Constants.MAIN);
                     final String description = dataMapItem.getDataMap()
                             .getString(Constants.DESCRIPTION);
+
+                    Forecast forecast = DataMapParcelableUtils.getParcelable(dataMapItem.getDataMap(), Constants.FORECAST_PARCEL, Forecast.CREATOR);
 
                     runOnUiThread(new Runnable() {
                         @Override

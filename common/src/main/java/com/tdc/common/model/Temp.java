@@ -1,11 +1,17 @@
 package com.tdc.common.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by douglas on 5/11/15.
  */
-public class Temp {
+public class Temp implements Parcelable {
 
     double day, min, max, night, eve, morn;
+
+    public Temp() {
+    }
 
     public double getDay() {
         return day;
@@ -66,4 +72,37 @@ public class Temp {
             },
      */
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(this.day);
+        dest.writeDouble(this.min);
+        dest.writeDouble(this.max);
+        dest.writeDouble(this.night);
+        dest.writeDouble(this.eve);
+        dest.writeDouble(this.morn);
+    }
+
+    private Temp(Parcel in) {
+        this.day = in.readDouble();
+        this.min = in.readDouble();
+        this.max = in.readDouble();
+        this.night = in.readDouble();
+        this.eve = in.readDouble();
+        this.morn = in.readDouble();
+    }
+
+    public static final Parcelable.Creator<Temp> CREATOR = new Parcelable.Creator<Temp>() {
+        public Temp createFromParcel(Parcel source) {
+            return new Temp(source);
+        }
+
+        public Temp[] newArray(int size) {
+            return new Temp[size];
+        }
+    };
 }

@@ -12,9 +12,13 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 import com.tdc.common.Constants;
+import com.tdc.common.DataMapParcelableUtils;
 import com.tdc.common.model.Forecast;
 import com.tdc.common.model.Temp;
 import com.tdc.common.model.Weather;
+
+import org.parceler.Parcel;
+import org.parceler.Parcels;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -91,6 +95,8 @@ public class WeatherService extends WearableListenerService {
                 dataMap.getDataMap().putString(Constants.TEMP_DAY, Double.toString(temp.getDay()));
                 dataMap.getDataMap().putString(Constants.MAIN, weather.getMain());
                 dataMap.getDataMap().putString(Constants.DESCRIPTION, weather.getDescription());
+
+                DataMapParcelableUtils.putParcelable(dataMap.getDataMap(), Constants.FORECAST_PARCEL, forecast);
 
                 PutDataRequest request = dataMap.asPutDataRequest();
                 Wearable.DataApi.putDataItem(mGoogleApiClient, request)
