@@ -1,8 +1,6 @@
 package com.tdc.tdcwear;
 
 import android.content.Context;
-import android.os.Message;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,21 +11,15 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
-import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.tdc.common.Constants;
-import com.tdc.tdcwear.model.Forecast;
-import com.tdc.tdcwear.model.Temp;
-import com.tdc.tdcwear.model.Weather;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.tdc.common.model.Forecast;
+import com.tdc.common.model.Temp;
+import com.tdc.common.model.Weather;
 
 import java.util.Date;
 import java.util.HashMap;

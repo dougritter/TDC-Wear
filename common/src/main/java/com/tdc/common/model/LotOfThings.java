@@ -1,4 +1,4 @@
-package com.tdc.tdcwear.model;
+package com.tdc.common.model;
 
 import java.util.List;
 

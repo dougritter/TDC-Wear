@@ -1,4 +1,4 @@
-package com.tdc.tdcwear.model;
+package com.tdc.common.model;
 
 /**
  * Created by douglas on 5/11/15.

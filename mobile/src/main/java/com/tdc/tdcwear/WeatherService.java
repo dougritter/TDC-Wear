@@ -12,9 +12,9 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 import com.tdc.common.Constants;
-import com.tdc.tdcwear.model.Forecast;
-import com.tdc.tdcwear.model.Temp;
-import com.tdc.tdcwear.model.Weather;
+import com.tdc.common.model.Forecast;
+import com.tdc.common.model.Temp;
+import com.tdc.common.model.Weather;
 
 import java.util.Date;
 import java.util.HashMap;
