@@ -1,25 +1,24 @@
 package com.tdc.tdcwear;
 
-import android.app.Service;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.IBinder;
+import android.content.Context;
 import android.util.Log;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
+import com.google.android.gms.wearable.WearableListenerService;
+import com.tdc.common.Constants;
 import com.tdc.tdcwear.model.Forecast;
+import com.tdc.tdcwear.model.Temp;
+import com.tdc.tdcwear.model.Weather;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.List;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
@@ -27,33 +26,99 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.http.GET;
 import retrofit.http.Path;
+import retrofit.http.QueryMap;
 
-public class WeatherService extends Service {
+public class WeatherService extends WearableListenerService {
+
+    private static final String LOG_TAG = "Weather Service";
+
+    private GoogleApiClient mGoogleApiClient;
+
 
     public WeatherService() {
+
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+    public void onCreate() {
+        super.onCreate();
+        mGoogleApiClient = getGoogleApiClient(this);
+        mGoogleApiClient.connect();
     }
 
-    public interface ForcastService {
+    private GoogleApiClient getGoogleApiClient(Context context) {
+        return new GoogleApiClient.Builder(context)
+                .addApi(Wearable.API)
+                .build();
+    }
+
+
+    @Override
+    public void onDataChanged(DataEventBuffer dataEvents) {
+        super.onDataChanged(dataEvents);
+
+        Log.e(LOG_TAG, "ON DATA CHANGED");
+
+        getForecast();
+
+
+    }
+
+
+    public interface ForecastService {
         @GET("/{directory}")
-        void listObjects(@Path("directory") String directory, Callback<Forecast> forecastCallback);
+        void listObjects(@Path("directory") String directory, @QueryMap Map<String, String> queryMap, Callback<Forecast> forecastCallback);
     }
 
-    RestAdapter restAdapter = new RestAdapter.Builder()
-            .setEndpoint("http://api.openweathermap.org/data/2.5/forecast/")
-            .build();
+
+    public void sendDataToWearable(Forecast forecast){
+
+        if(forecast != null && forecast.getList().size() > 0){
+
+            Temp temp = null;
+            Weather weather = null;
+            try {
+                temp = forecast.getList().get(0).getTemp();
+                weather = forecast.getList().get(0).getWeather().get(0);
+            } catch (IndexOutOfBoundsException e) {
+                e.printStackTrace();
+            }
+
+            if(temp != null && weather != null){
+                PutDataMapRequest dataMap = PutDataMapRequest.create(Constants.PATH);
+                dataMap.getDataMap().putLong("time", new Date().getTime());
+                dataMap.getDataMap().putString(Constants.CITY_NAME, forecast.getCity().getName());
+                dataMap.getDataMap().putString(Constants.TEMP_DAY, Double.toString(temp.getDay()));
+                dataMap.getDataMap().putString(Constants.MAIN, weather.getMain());
+                dataMap.getDataMap().putString(Constants.DESCRIPTION, weather.getDescription());
+
+                PutDataRequest request = dataMap.asPutDataRequest();
+                Wearable.DataApi.putDataItem(mGoogleApiClient, request)
+                        .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+                            @Override
+                            public void onResult(DataApi.DataItemResult dataItemResult) {
+                                Log.e(LOG_TAG, "Sending forecast was successful: " + dataItemResult.getStatus()
+                                        .isSuccess());
+                            }
+                        });
+
+            }
+        }
+    }
+
 
     public void getForecast(){
-        ForcastService service = restAdapter.create(ForcastService.class);
-        service.listObjects("daily", new Callback<Forecast>() {
+
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint("http://api.openweathermap.org/data/2.5/forecast/")
+                .build();
+
+        ForecastService service = restAdapter.create(ForecastService.class);
+        service.listObjects("daily", getQueryMap(), new Callback<Forecast>() {
             @Override
             public void success(Forecast forecast, Response response) {
                 Log.e("RESPONSE: ", forecast.toString());
+                sendDataToWearable(forecast);
             }
 
             @Override
@@ -63,127 +128,20 @@ public class WeatherService extends Service {
         });
     }
 
+    public Map<String, String> getQueryMap(){
 
+        final String QUERY_PARAM = "q";
+        final String FORMAT_PARAM = "mode";
+        final String UNITS_PARAM = "units";
+        final String DAYS_PARAM = "cnt";
 
-    private class FetchWeatherTask extends AsyncTask<String, Void, Void> {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(QUERY_PARAM, "Florianopolis");
+        map.put(FORMAT_PARAM, "json");
+        map.put(UNITS_PARAM, "metric");
+        map.put(DAYS_PARAM, "7");
 
-        private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
-
-
-        // These two need to be declared outside the try/catch
-        // so that they can be closed in the finally block.
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-
-        // Will contain the raw JSON response as a string.
-        String forecastJsonStr = null;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            Log.d(LOG_TAG, "ON PRE EXECUTE");
-
-        }
-
-        @Override
-        protected Void doInBackground(String... params) {
-
-            String format = "json";
-            String units = "metric";
-            int days = 7;
-
-            try {
-                // Construct the URL for the OpenWeatherMap query
-                // Possible parameters are avaiable at OWM's forecast API page, at
-                // http://openweathermap.org/API#forecast
-
-                //http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7
-//                http://api.openweathermap.org/data/2.5/forecast/daily?q=florianopolis&mode=json&units=metric&cnt=7
-
-                final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
-                final String QUERY_PARAM = "q";
-                final String FORMAT_PARAM = "mode";
-                final String UNITS_PARAM = "units";
-                final String DAYS_PARAM = "cnt";
-
-                Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                        .appendQueryParameter(QUERY_PARAM, params[0])
-                        .appendQueryParameter(FORMAT_PARAM, format)
-                        .appendQueryParameter(UNITS_PARAM, units)
-                        .appendQueryParameter(DAYS_PARAM, Integer.toString(days))
-                        .build();
-
-                Log.d(LOG_TAG, "BUILT URI " + builtUri.toString());
-                URL url = new URL(builtUri.toString());
-
-                // Create the request to OpenWeatherMap, and open the connection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                // Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return null;
-                }
-
-                forecastJsonStr = buffer.toString();
-                Log.v(LOG_TAG, forecastJsonStr);
-
-
-
-
-
-
-
-
-            } catch (IOException e) {
-                Log.e("PlaceholderFragment", "Error "+e.getMessage(), e);
-                // If the code didn't successfully get the weather data, there's no point in attemping
-                // to parse it.
-                return null;
-            }
-
-
-            return null;
-        }
-
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e("PlaceholderFragment", "Error closing stream", e);
-                }
-            }
-
-            Log.d(LOG_TAG, "ON POST EXECUTE");
-
-        }
+        return map;
 
     }
 

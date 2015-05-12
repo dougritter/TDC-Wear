@@ -20,9 +20,10 @@
         </activity>
 
         <service
-            android:name=".WeatherService"
-            android:enabled="true"
-            android:exported="true" >
+            android:name=".WeatherService">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
+            </intent-filter>
         </service>
     </application>
 

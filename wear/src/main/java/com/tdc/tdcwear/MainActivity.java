@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.data.FreezableUtils;
 import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
@@ -22,9 +23,11 @@ import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.tdc.common.Constants;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -97,7 +100,10 @@ public class MainActivity extends Activity implements DataApi.DataListener,
                 List<Node> nodes = result.getNodes();
                 if (nodes.size() > 0) {
                     nodeId = nodes.get(0).getId();
-                    sendToast();
+
+                    callWeatherService();
+
+//                    sendToast();
                 }
             }
         }).start();
@@ -124,7 +130,24 @@ public class MainActivity extends Activity implements DataApi.DataListener,
         Wearable.MessageApi.addListener(mGoogleApiClient, this);
         Wearable.NodeApi.addListener(mGoogleApiClient, this);
 
+
     }
+
+    public void callWeatherService(){
+        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Constants.WEATHER_SERVICE_PATH);
+        putDataMapRequest.getDataMap().putLong("time", new Date().getTime());
+
+        Wearable.DataApi.putDataItem(mGoogleApiClient, putDataMapRequest.asPutDataRequest())
+                .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+                    @Override
+                    public void onResult(DataApi.DataItemResult dataItemResult) {
+                        Log.e(LOG_TAG, "Calling forecast was successful: " + dataItemResult.getStatus()
+                                .isSuccess());
+                    }
+                });
+
+    }
+
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -147,7 +170,6 @@ public class MainActivity extends Activity implements DataApi.DataListener,
 
                     DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
 
-
                     final String cityName = dataMapItem.getDataMap()
                             .getString(Constants.CITY_NAME);
                     final String temperature = dataMapItem.getDataMap()
@@ -163,7 +185,7 @@ public class MainActivity extends Activity implements DataApi.DataListener,
                             mProgressBar.setVisibility(View.GONE);
 
                             mCityName.setText(cityName);
-                            mTemperature.setText(temperature+"ºC");
+                            mTemperature.setText(temperature + "ºC");
                             mMainInfo.setText(main);
                             mMDescription.setText(description);
                         }
