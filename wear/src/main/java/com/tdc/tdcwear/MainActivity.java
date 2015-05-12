@@ -53,6 +53,8 @@ public class MainActivity extends Activity implements DataApi.DataListener,
     private TextView mMDescription;
     private ProgressBar mProgressBar;
 
+    private boolean alreadySet = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -136,17 +138,21 @@ public class MainActivity extends Activity implements DataApi.DataListener,
     }
 
     public void callWeatherService(){
-        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Constants.WEATHER_SERVICE_PATH);
-        putDataMapRequest.getDataMap().putLong("time", new Date().getTime());
 
-        Wearable.DataApi.putDataItem(mGoogleApiClient, putDataMapRequest.asPutDataRequest())
-                .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
-                    @Override
-                    public void onResult(DataApi.DataItemResult dataItemResult) {
-                        Log.e(LOG_TAG, "Calling forecast was successful: " + dataItemResult.getStatus()
-                                .isSuccess());
-                    }
-                });
+        if(!alreadySet){
+            PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Constants.WEATHER_SERVICE_PATH);
+            putDataMapRequest.getDataMap().putLong("time", new Date().getTime());
+
+            Wearable.DataApi.putDataItem(mGoogleApiClient, putDataMapRequest.asPutDataRequest())
+                    .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+                        @Override
+                        public void onResult(DataApi.DataItemResult dataItemResult) {
+                            Log.e(LOG_TAG, "Calling forecast was successful: " + dataItemResult.getStatus()
+                                    .isSuccess());
+                        }
+                    });
+        }
+
 
     }
 
@@ -195,6 +201,8 @@ public class MainActivity extends Activity implements DataApi.DataListener,
                         }
                     });
 
+                    alreadySet = true;
+                    mGoogleApiClient.disconnect();
 
                     Log.e(LOG_TAG, "MAIN: "+main);
 

@@ -17,9 +17,6 @@ import com.tdc.common.model.Forecast;
 import com.tdc.common.model.Temp;
 import com.tdc.common.model.Weather;
 
-import org.parceler.Parcel;
-import org.parceler.Parcels;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
