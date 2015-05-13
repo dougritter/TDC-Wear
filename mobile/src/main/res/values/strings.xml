@@ -3,4 +3,37 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
+    <string-array name="notificacoes">
+        <item>@string/notification_simple_title</item>
+        <item>@string/notification_action_title</item>
+        <item>@string/notification_stacked_title</item>
+        <item>@string/notification_pages_title</item>
+        <item>@string/notification_reply_title</item>
+    </string-array>
+
+    <string name="notification_simple_title">Notificação simples</string>
+    <string name="notification_action_title">Notificação com ação</string>
+    <string name="notification_stacked_title">Notificação empilhadas</string>
+    <string name="notification_pages_title">Notificação com páginas</string>
+    <string name="notification_page2_title">Título da página 2</string>
+    <string name="notification_page2_text">Olá\nTexto da página 2. Aqui podemos ter algo bem extenso como o histórico de conversas de mensagens instantâneas. E essa página só é exibida no wearable, não no mobile.</string>
+    <string name="notification_text">Um texto qualquer</string>
+    <string name="notification_action_calendar">Agenda</string>
+    <string name="notification_title_with_count">Notificação %1$d</string>
+    <string name="notification_text_with_count"><b>Notificação %1$d</b> Texto da mensagem</string>
+    <string name="notification_count">%1$d novas mensagens.</string>
+    <string name="notification_reply_title">Notificação com resposta</string>
+    <string name="notification_reply_text">Deslize para esquerda para responder...</string>
+    <string name="reply_label">Responder</string>
+    <string name="reply_question">Qual a sua resposta?</string>
+
+    <string-array name="reply_choices">
+        <item>Sim</item>
+        <item>Não</item>
+        <item>Talvez</item>
+    </string-array>
+
+    <string name="title_activity_reply">Resposta do wear...</string>
+
 </resources>
