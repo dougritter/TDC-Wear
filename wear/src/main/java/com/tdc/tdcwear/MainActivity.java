@@ -43,36 +43,27 @@ public class MainActivity extends Activity implements DataApi.DataListener,
     private static int CONNECTION_TIME_OUT_MS = 50000;
     private static final String LOG_TAG = "WEAR MAIN ACTIVITY";
 
-    private TextView mTextView;
     private GoogleApiClient mGoogleApiClient;
     private String nodeId;
 
-    private TextView mCityName;
-    private TextView mTemperature;
-    private TextView mMainInfo;
-    private TextView mMDescription;
-    private ProgressBar mProgressBar;
+    @InjectView(R.id.city_name)
+    TextView mCityName;
+    @InjectView(R.id.temperature)
+    TextView mTemperature;
+    @InjectView(R.id.main_info)
+    TextView mMainInfo;
+    @InjectView(R.id.description)
+    TextView mMDescription;
+    @InjectView(R.id.progressBar)
+    ProgressBar mProgressBar;
 
     private boolean alreadySet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.main_common_layout);
         ButterKnife.inject(this);
-
-        final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
-            @Override
-            public void onLayoutInflated(WatchViewStub stub) {
-                mTextView = (TextView) stub.findViewById(R.id.text);
-                mCityName = (TextView) stub.findViewById(R.id.city_name);
-                mTemperature = (TextView) stub.findViewById(R.id.temperature);
-                mMainInfo = (TextView) stub.findViewById(R.id.main_info);
-                mMDescription = (TextView) stub.findViewById(R.id.description);
-                mProgressBar = (ProgressBar) stub.findViewById(R.id.progressBar);
-            }
-        });
 
         retrieveDeviceNode();
 

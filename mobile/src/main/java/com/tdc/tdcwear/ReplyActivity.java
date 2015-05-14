@@ -6,7 +6,12 @@ import android.support.v4.app.RemoteInput;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
-
+/*
+Esta classe é de autoria de Nelson Glauber
+e seu uso foi previamente autorizado.
+O código original está disponível em:
+https://github.com/nglauber/NextLevelApps
+*/
 public class ReplyActivity extends AppCompatActivity {
 
     @Override

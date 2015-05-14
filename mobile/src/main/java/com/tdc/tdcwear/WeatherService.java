@@ -58,7 +58,7 @@ public class WeatherService extends WearableListenerService {
     public void onDataChanged(DataEventBuffer dataEvents) {
         super.onDataChanged(dataEvents);
 
-        Log.e(LOG_TAG, "ON DATA CHANGED");
+        Log.d(LOG_TAG, "ON DATA CHANGED");
 
         getForecast();
 
@@ -100,7 +100,7 @@ public class WeatherService extends WearableListenerService {
                         .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
                             @Override
                             public void onResult(DataApi.DataItemResult dataItemResult) {
-                                Log.e(LOG_TAG, "Sending forecast was successful: " + dataItemResult.getStatus()
+                                Log.d(LOG_TAG, "Sending forecast was successful: " + dataItemResult.getStatus()
                                         .isSuccess());
                             }
                         });

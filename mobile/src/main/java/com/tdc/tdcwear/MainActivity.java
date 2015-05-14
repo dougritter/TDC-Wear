@@ -89,9 +89,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onConnected(Bundle bundle) {
         Log.e(LOG_TAG, "ON CONNECTED");
-//        Wearable.DataApi.addListener(mGoogleApiClient, this);
         Wearable.MessageApi.addListener(mGoogleApiClient, this);
-//        Wearable.NodeApi.addListener(mGoogleApiClient, this);
 
     }
 

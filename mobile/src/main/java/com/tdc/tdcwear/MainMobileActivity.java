@@ -8,7 +8,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-
+/*
+Esta classe é de autoria de Nelson Glauber
+e seu uso foi previamente autorizado.
+O código original está disponível em:
+https://github.com/nglauber/NextLevelApps
+*/
 public class MainMobileActivity extends AppCompatActivity {
 
     private static final int NOTIFICATION_SIMPLE = 0;

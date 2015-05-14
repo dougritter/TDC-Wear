@@ -10,7 +10,12 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.RemoteInput;
 import android.text.Html;
-
+/*
+Esta classe é de autoria de Nelson Glauber
+e seu uso foi previamente autorizado.
+O código original está disponível em:
+https://github.com/nglauber/NextLevelApps
+*/
 public class NotificationUtils {
 
     public static final String EXTRA_VOICE_REPLY = "extra_voice_reply";
